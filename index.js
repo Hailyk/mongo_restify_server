@@ -20,11 +20,11 @@ colors.setTheme({
     info: 'grey'
 });
 
-run();
+setup(run());
 
 // setup function
 // @arg next function next function to run
-function setup(next){
+function setup(next = ()=>{}){
     var certificate, key;
     // read ssl
     try{
@@ -46,12 +46,15 @@ function setup(next){
     
     // create mongo client instance
     mongoClient = mongo.MongoClient;
+    
+    //call next function
+    next;
 }
 
 function run(){
-
     // get db instance
     var db = connectDb(url);
+
 
 
     //TODO: close db connection
@@ -67,4 +70,40 @@ function connectDb(url){
         return db;
     });
     throw new Error("Unable to connect to database, check url");
+}
+
+// rest get method
+// @arg db object db instance
+function restGet(db){
+    //TODO: create get method
+}
+
+// rest head method
+// @arg db object db instance
+function restHead(db){
+    //TODO: create Head method
+}
+
+// rest post method, replace data
+// @arg db object db instance
+function restPost(db){
+    //TODO: create Post method
+}
+
+// rest put method, push data to stack
+// @arg db object db instance
+function restPut(db){
+    //TODO: create Put method
+}
+
+// rest update method
+// @arg db object db instance
+function restUpdate(db){
+    //TODO: create Update method
+}
+
+// rest delete method
+// @arg db object db instance
+function restDelete(){
+
 }
