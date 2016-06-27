@@ -43,7 +43,9 @@ function setup(next = ()=>{}){
         key: key,
         name: name
     });
-    
+
+    server.use(restify.queryParser());
+
     // create mongo client instance
     mongoClient = mongo.MongoClient;
     
@@ -55,7 +57,9 @@ function run(){
     // get db instance
     var db = connectDb(url);
 
-
+    server.get("/", (request, response, next)=>{
+        var location = request.query.location;
+    });
 
     //TODO: close db connection
 }
@@ -96,14 +100,8 @@ function restPut(db){
     //TODO: create Put method
 }
 
-// rest update method
-// @arg db object db instance
-function restUpdate(db){
-    //TODO: create Update method
-}
-
 // rest delete method
 // @arg db object db instance
 function restDelete(){
-
+    //TODO: create delete method
 }
