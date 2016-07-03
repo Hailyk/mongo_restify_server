@@ -1,7 +1,7 @@
 'use strict';
 
 // dependency declaration
-var mongo = require('mongodb'),
+var mongoClient = require('mongodb').MongoClient,
     assert = require('assert'),
     restify = require('restify'),
     colors = require('colors'),
@@ -9,10 +9,11 @@ var mongo = require('mongodb'),
     path = require('path');
 
 // constant variable
-const url = 'mongodb://localhost:27017/myproject', name="testServer";
+const url = 'mongodb://192.168.99.100', name="testServer",
+    port = process.env.port || 80;
 
 // instance variable
-var server, mongoClient;
+var db;
 
 colors.setTheme({
     error: 'red',
@@ -20,11 +21,11 @@ colors.setTheme({
     info: 'grey'
 });
 
-setup(run());
+start();
 
 // setup function
 // @arg next function next function to run
-function setup(next = ()=>{}){
+function start(){
     var certificate, key;
     // read ssl
     try{
@@ -38,70 +39,223 @@ function setup(next = ()=>{}){
     }
     
     // create Restify server instance
-    server = certificate == "" && key == "" ? restify.createServer({}) : restify.createServer({
+    var server = certificate == "" && key == "" ? restify.createServer({}) : restify.createServer({
         certificate: certificate,
         key: key,
         name: name
     });
 
     server.use(restify.queryParser());
+    server.use(restify.bodyParser({mapParams: true}));
 
-    // create mongo client instance
-    mongoClient = mongo.MongoClient;
-    
-    //call next function
-    next;
-}
-
-function run(){
-    // get db instance
-    var db = connectDb(url);
-
+    // get request handler
+    // TODO: handle text and json type
     server.get("/", (request, response, next)=>{
-        var location = request.query.location;
+        var collection = request.query.collection;
+        if(collection == null) collection = "";
+        var query = request.query.query;
+        if(query == null) query = {};
+        else {
+            query = JSON.parse(query);
+        }
+        mongoClient.connect(url, (err, data)=>{
+            if (!err) {
+                console.log("Connected successfully to " + url + " database");
+                restGet(data, collection, query, (err, data)=> {
+                    if (err) {
+                        response.send({
+                            error: true,
+                            data: data
+                        });
+                    } else {
+                        response.send({
+                            error: false,
+                            data: data
+                        });
+                    }
+                });
+            } else {
+                response.send({
+                    error: true,
+                    data: "unable to connect to db contact db admin"
+                });
+            }
+        });
+        next();
     });
 
-    //TODO: close db connection
-}
-
-// connect to database
-// @arg url string url of mongo database
-// @return object database instance
-function connectDb(url){
-    mongoClient.connect(url, function(err, db) {
-        assert.equal(null, err);
-        console.info("Connected succesfully to database");
-        return db;
+    // post request handler
+    // TODO: handle text and json type
+    server.post("/", (request, response, next)=>{
+        var collection = request.query.collection;
+        if(collection == null) collection = "";
+        var body = request.body;
+        if(body != null) {
+            mongoClient.connect(url, (err, data)=>{
+                if (!err) {
+                    console.info("Connected successfully to " + url + " database");
+                    restPost(data, collection, body, (err, result)=> {
+                        if (err) {
+                            console.log(err);
+                            response.send({
+                                error: true,
+                                data: result
+                            });
+                        } else {
+                            response.send({
+                                error: false,
+                                data: result
+                            });
+                        }
+                
+                    });
+                } else {
+                    response.send({
+                        error: true,
+                        data: "unable to connect to db contact db admin"
+                    });
+                }
+            });
+        } else {
+            response.send({
+                error: true,
+                data: "empty body"
+            });
+        }
+        next();
     });
-    throw new Error("Unable to connect to database, check url");
+
+    // put request handler
+    // TODO: handle text and json type
+    server.put("/", (request, response, next)=>{
+        var collection = request.query.collection;
+        if(collection == null) collection = "";
+        var query = request.query.query;
+        if(query == null) query = {};
+        else query = JSON.parse(query);
+        var body = request.body;
+        if(body != null) {
+            body = JSON.parse(body);
+            mongoClient.connect(url, (err, data)=>{
+                if (!err) {
+                    console.info("Connected successfully to " + url + " database");
+                    restPut(data, collection, query, body, (err, result)=> {
+                        if (err) {
+                            console.log(err);
+                            response.send({
+                                error: true,
+                                data: result
+                            });
+                        } else {
+                            response.send({
+                                error: false,
+                                data: result
+                            });
+                        }
+
+                    });
+                } else {
+                    response.send({
+                        error: true,
+                        data: "unable to connect to db contact db admin"
+                    });
+                }
+            });
+        } else {
+            response.send({
+                error: true,
+                data: "request doesn't have body"
+            });
+        }
+        next();
+    });
+
+    // delete request handler
+    // TODO: handle text and json type
+    server.del("/", (request, response, next)=>{
+        var collection = request.query.collection;
+        if(collection == null) collection = "";
+        var query = request.query.query;
+        if(query == null) query = {};
+        else query = JSON.parse(query);
+        mongoClient.connect(url, (err, data)=>{
+            if (!err) {
+                console.info("Connected successfully to " + url + " database");
+                restDelete(data, collection, query, (err, result)=> {
+                    if (err) {
+                        response.send({
+                            error: true,
+                            data: "error is error"
+                        });
+                    } else {
+                        response.send({
+                            error: false,
+                            data: result
+                        });
+                    }
+                });
+            } else {
+                response.send({
+                    error: true,
+                    data: "unable to connect to db contact db admin"
+                });
+            }
+        });
+        next();
+    });
+    
+    server.listen(port, (err)=>{
+        if(err){
+            console.error("Failed to start server".warn);
+        }
+        console.info("server listening on port "+ port);
+    });
 }
 
 // rest get method
-// @arg db object db instance
-function restGet(db){
-    //TODO: create get method
-}
-
-// rest head method
-// @arg db object db instance
-function restHead(db){
-    //TODO: create Head method
+// @arg db object
+// @arg collection string
+// @arg query object
+// @arg callback function
+function restGet(db, collection, query, callback){
+    db.collection(collection).find(query).toArray((err, data)=>{
+        callback(err, data);
+    })
 }
 
 // rest post method, replace data
 // @arg db object db instance
-function restPost(db){
-    //TODO: create Post method
+// @arg collection string
+// @arg data object
+// @arg function
+function restPost(db, collection, data, callback){
+    db.collection(collection).insertOne(data, (err, result)=>{
+        callback(err, result);
+    });
+
 }
 
 // rest put method, push data to stack
 // @arg db object db instance
-function restPut(db){
-    //TODO: create Put method
+// @arg collection string
+// @arg filter object
+// @arg data object
+// @arg callback function
+function restPut(db, collection, filter, data, callback){
+    db.collection(collection).updateMany(filter, {$set:data}, (err, result)=>{
+        console.log(err);
+        if(err) console.error(err);
+        callback(err, result);
+    });
 }
 
 // rest delete method
 // @arg db object db instance
-function restDelete(){
-    //TODO: create delete method
+// @arg collection string
+// @arg filter object
+// @arg callback function
+function restDelete(db, collection, filter, callback){
+    db.collection(collection).deleteMany(filter, (err, result)=>{
+        callback(err, result);
+    });
 }
