@@ -19,7 +19,7 @@ Every http method takes different queries, however all of them requires **collec
 
 ## Configuration
         
-``` json
+``` 
     {
         "name": "mongoRestify", "name for server"
         "logging": true, "Log to console when request received"
@@ -28,7 +28,7 @@ Every http method takes different queries, however all of them requires **collec
         "auth": true, "true to enable authentication from user array below"
         "user":[ "user array"
             {
-                "key": "ce4efc8di3ccag5425ilj6c9u7c502b2", "key to access server",
+                "key": "ce4efc8di3ccag5425ilj6c9u7c502b2", "key to access server"
                 "name": "test" "name of the key"
             },
             {
@@ -59,7 +59,7 @@ Example:
 |key|Server access key in the user config|
 
 ### data returned
-``` json
+``` 
 {
     "error": "boolean if error occured it will be true else false",
     "data": "if no error occured this will be the json data return, else it will be error message"
@@ -83,7 +83,7 @@ and request body will be the json you wish to be saved
 |key|Server access key in the user config|
 
 request body:
-``` json
+``` 
 {
     "username":"jiahaok",
     "password":"password123",
@@ -96,7 +96,7 @@ request body:
 
 ### data returned
 
-``` json
+``` 
 {
     "error": "boolean if error occured it will be true else false",
     "data:{ 
@@ -136,8 +136,8 @@ request body:
 {
     "error": "boolean if error occured it will be true else false",
     "data":{
-        "ok":1
-        "nModified":2
+        "ok":1,
+        "nModified":2,
         "n":2
     }
 }
@@ -165,7 +165,7 @@ Example:
 {
     "error": "boolean if error occured it will be true else false",
     "data":{
-        "ok":1
+        "ok":1,
         "n":2
     }
 }
