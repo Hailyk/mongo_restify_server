@@ -21,15 +21,15 @@ Every http method takes different queries, however all of them requires **collec
         
 ``` json
     {
-        "name": "mongoRestify", // name for server
-        "logging": true, // Log to console when request received
-        "database_url": "mongodb://192.168.99.100", // url to mongodb
-        "port": 80, // port to start server on
-        "auth": true, // true to enable authentication from user array below
-        "user":[ // user array
+        "name": "mongoRestify", "name for server"
+        "logging": true, "Log to console when request received"
+        "database_url": "mongodb://192.168.99.100", "url to mongodb"
+        "port": 80, "port to start server on"
+        "auth": true, "true to enable authentication from user array below"
+        "user":[ "user array"
             {
-                "key": "ce4efc8di3ccag5425ilj6c9u7c502b2", // key to access server
-                "name": "test" // name of the key
+                "key": "ce4efc8di3ccag5425ilj6c9u7c502b2", "key to access server"
+                "name": "test" "name of the key"
             },
             {
                 "key": "ceeeff8dd01baf53d264251f66c502bc",
@@ -61,8 +61,8 @@ Example:
 ### data returned
 ``` json
 {
-    error: boolean if error occured it will be true else false
-    data: if no error occured this will be the json data return, else it will be error message
+    "error": "boolean if error occured it will be true else false"
+    "data": "if no error occured this will be the json data return, else it will be error message"
 }
 ```
 
@@ -87,7 +87,7 @@ request body:
 {
     "username":"jiahaok",
     "password":"password123",
-    "name"{
+    "name":{
         "first":"jiahao",
         "last":"kuang"
     }
@@ -98,10 +98,10 @@ request body:
 
 ``` json
 {
-    error: boolean if error occured it will be true else false
-    data:{ // if no error occured this will be the json data return, else it will be error message
-        ok:1
-        n:1
+    "error": "boolean if error occured it will be true else false"
+    "data:{ 
+        "ok":1
+        "n":1
     }
 }
 ```
@@ -134,11 +134,11 @@ request body:
 
 ``` json
 {
-    error: boolean if error occured it will be true else false
-    data:{ // if no error occured this will be the json data return, else it will be error message
-        ok:1
-        nModified:2
-        n:2
+    "error": "boolean if error occured it will be true else false"
+    "data":{
+        "ok":1
+        "nModified":2
+        "n":2
     }
 }
 ```
@@ -163,10 +163,10 @@ Example:
 
 ``` json
 {
-    error: boolean if error occured it will be true else false
-    data:{ // if no error occured this will be the json data return, else it will be error message
-        ok:1
-        n:2
+    "error": "boolean if error occured it will be true else false"
+    "data":{
+        "ok":1
+        "n":2
     }
 }
 ```
