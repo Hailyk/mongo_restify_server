@@ -93,15 +93,17 @@ function start(){
 
     // post request handler
     server.post("/", (request, response, next)=>{
+        // authenticator 
         authenticator(config, request, (error, name)=> {
+            // log traffic
             var d = new Date();
             if (log) console.log(d.getTime() + " Get request to " + request.getQuery() + " from " + request.connection.remoteAddress + ", key name:" + name);
-            request.accepts('text/plain');
-            request.accepts('application/json');
+            // request parma collection
             var collection = request.query.collection;
             if (collection == null) collection = "";
             var body = request.body;
             if (body != null) {
+                // turn string into json
                 if (typeof body == "string") body = JSON.parse(body);
                 mongoClient.connect(url, (err, data)=> {
                     if (!err) {
@@ -127,9 +129,12 @@ function start(){
 
     // put request handler
     server.put("/", (request, response, next)=>{
+        // authenticator 
         authenticator(config, request, (error, name)=> {
+            // log traffic
             var d = new Date();
             if (log) console.log(d.getTime() + " Get request to " + request.getQuery() + " from " + request.connection.remoteAddress + ", key name:" + name);
+            // request parma collection
             var collection = request.query.collection;
             if (collection == null) collection = "";
             var query = request.query.query;
@@ -137,7 +142,9 @@ function start(){
             else query = JSON.parse(query);
             var body = request.body;
             if (body != null) {
+                // turn string into json
                 if (typeof body == "string") body = JSON.parse(body);
+                // establish connection to database
                 mongoClient.connect(url, (err, data)=> {
                     if (!err) {
                         restPut(data, collection, query, body, (err, result)=> {
