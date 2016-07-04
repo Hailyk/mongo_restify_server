@@ -52,28 +52,22 @@ function start(){
 
     // get request handler
     server.get("/", (request, response, next)=>{
+        // get and check collection
         var collection = request.query.collection;
         if(collection == null) collection = "";
+        // get and check query
         var query = request.query.query;
         if(query == null) query = {};
         else query = JSON.parse(query);
+        // establish connection to database
         mongoClient.connect(url, (err, data)=>{
             if (!err) {
                 console.log("Connected successfully to " + url + " database");
                 restGet(data, collection, query, (err, data)=> {
-                    if (err) {
-                        response.send({
-                            error: true,
-                            data: data
-                        });
-                    } else {
-                        response.send({
-                            error: false,
-                            data: data
-                        });
-                    }
+                    responseHandler(err, response, data);
                 });
             } else {
+                // handle connection error
                 response.send({
                     error: true,
                     data: "unable to connect to db contact db admin"
@@ -96,19 +90,7 @@ function start(){
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
                     restPost(data, collection, body, (err, result)=> {
-                        if (err) {
-                            console.log(err);
-                            response.send({
-                                error: true,
-                                data: result
-                            });
-                        } else {
-                            response.send({
-                                error: false,
-                                data: result
-                            });
-                        }
-                
+                        responseHandler(err, response, result);
                     });
                 } else {
                     response.send({
@@ -142,19 +124,7 @@ function start(){
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
                     restPut(data, collection, query, body, (err, result)=> {
-                        if (err) {
-                            console.log(err);
-                            response.send({
-                                error: true,
-                                data: result
-                            });
-                        } else {
-                            response.send({
-                                error: false,
-                                data: result
-                            });
-                        }
-
+                        responseHandler(err, response, result);
                     });
                 } else {
                     response.send({
@@ -185,17 +155,7 @@ function start(){
             if (!err) {
                 console.info("Connected successfully to " + url + " database");
                 restDelete(data, collection, query, (err, result)=> {
-                    if (err) {
-                        response.send({
-                            error: true,
-                            data: result
-                        });
-                    } else {
-                        response.send({
-                            error: false,
-                            data: result
-                        });
-                    }
+                    responseHandler(err, response, result);
                 });
             } else {
                 response.send({
@@ -259,4 +219,23 @@ function restDelete(db, collection, filter, callback){
     db.collection(collection).deleteMany(filter, (err, result)=>{
         callback(err, result);
     });
+}
+
+// @arg error object
+// @arg response object
+// @arg data object
+function responseHandler(error, response, data){
+    if (error) {
+        // error handler for data retrieval
+        response.send({
+            error: true,
+            data: data
+        });
+    } else {
+        // send back data
+        response.send({
+            error: false,
+            data: data
+        });
+    }
 }
