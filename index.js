@@ -7,15 +7,24 @@ var mongoClient = require('mongodb').MongoClient,
     restify = require('restify'),
     colors = require('colors'),
     fs = require('fs'),
-    path = require('path');
+    path = require('path'),
+    config = require('./config');
 
 // constant variable
-const url = 'mongodb://192.168.99.100', name="testServer",
-    port = process.env.port || 80;
+const url = config.database_url,
+    name= config.name,
+    port = process.env.port || config.port;
+
+var log = false;
+
+if(config.logging == true){
+    log = true;
+}
 
 // instance variable
 var db;
 
+// console color
 colors.setTheme({
     error: 'red',
     warn: 'yellow',
@@ -46,12 +55,15 @@ function start(){
         name: name
     });
 
+    // restify tool import
     server.use(restify.queryParser());
     server.use(restify.bodyParser({mapParams: true}));
     server.pre(restify.pre.userAgentConnection());
 
     // get request handler
     server.get("/", (request, response, next)=>{
+        var d =  new Date();
+        if(log) console.log(d.getTime() +" Get request to "+ request.path + " from "+ request.connection.remoteAddress);
         // get and check collection
         var collection = request.query.collection;
         if(collection == null) collection = "";
@@ -62,7 +74,6 @@ function start(){
         // establish connection to database
         mongoClient.connect(url, (err, data)=>{
             if (!err) {
-                console.log("Connected successfully to " + url + " database");
                 restGet(data, collection, query, (err, data)=> {
                     responseHandler(err, response, data);
                 });
@@ -79,6 +90,8 @@ function start(){
 
     // post request handler
     server.post("/", (request, response, next)=>{
+        var d =  new Date();
+        if(log) console.log(d.getTime() +" Get request to "+ request.path + " from "+ request.connection.remoteAddress);
         request.accepts('text/plain');
         request.accepts('application/json');
         var collection = request.query.collection;
@@ -88,7 +101,6 @@ function start(){
             if(typeof body == "string") body = JSON.parse(body);
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
-                    console.info("Connected successfully to " + url + " database");
                     restPost(data, collection, body, (err, result)=> {
                         responseHandler(err, response, result);
                     });
@@ -110,8 +122,8 @@ function start(){
 
     // put request handler
     server.put("/", (request, response, next)=>{
-        request.accepts('text/plain');
-        request.accepts('application/json');
+        var d =  new Date();
+        if(log) console.log(d.getTime() +" Get request to "+ request.path + " from "+ request.connection.remoteAddress);
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var query = request.query.query;
@@ -122,7 +134,6 @@ function start(){
             if(typeof body == "string") body = JSON.parse(body);
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
-                    console.info("Connected successfully to " + url + " database");
                     restPut(data, collection, query, body, (err, result)=> {
                         responseHandler(err, response, result);
                     });
@@ -144,8 +155,8 @@ function start(){
 
     // delete request handler
     server.del("/", (request, response, next)=>{
-        request.accepts('text/plain');
-        request.accepts('application/json');
+        var d =  new Date();
+        if(log) console.log(d.getTime() +" Get request to "+ request.path + " from "+ request.connection.remoteAddress);
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var query = request.query.query;
@@ -153,7 +164,6 @@ function start(){
         else query = JSON.parse(query);
         mongoClient.connect(url, (err, data)=>{
             if (!err) {
-                console.info("Connected successfully to " + url + " database");
                 restDelete(data, collection, query, (err, result)=> {
                     responseHandler(err, response, result);
                 });
