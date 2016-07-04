@@ -39,6 +39,10 @@ Every http method takes different queries, however all of them requires **collec
     }
 ```
 
+## TSL/SSL
+
+To enable TSL/SSL simply place the certificate named "certificate" and key named "key" into the ssl folder.
+
 ## Get Request
 
 Get request is used to retrieve information, this performs `find()`.

@@ -1,16 +1,18 @@
 {
   "name": "restify_mongo",
-  "version": "0.1.0-alpha",
+  "version": "1.0",
   "description": "A restify mongodb server",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "prestart": "npm install",
+    "start": "npm index.js"
   },
   "keywords": [
     "restify",
     "mongodb"
   ],
-  "author": "@jiahaok",
+  "author": "@jiahaok(Jiahao Kuang)",
   "license": "MIT",
   "dependencies": {
     "colors": "^1.1.2",
