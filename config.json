@@ -2,5 +2,20 @@
     "name": "mongoRestify",
     "logging": true,
     "database_url": "mongodb://192.168.99.100",
-    "port": 80
+    "port": 80,
+    "throttle": {
+        "burst": 100,
+        "rate": 50
+    },
+    "auth": true,
+    "user":[
+        {
+            "key": "ce4efc8di3ccag5425ilj6c9u7c502b2",
+            "name": "test"
+        },
+        {
+            "key": "ceeeff8dd01baf53d264251f66c502bc",
+            "name": "another key"
+        }
+    ]
 }
