@@ -1,6 +1,6 @@
 'use strict';
 
-// TODO: remove debu temp codes
+// TODO: remove debug temp codes
 // dependency declaration
 var mongoClient = require('mongodb').MongoClient,
     assert = require('assert'),
@@ -26,7 +26,6 @@ start();
 
 // setup function
 // @arg next function next function to run
-// TODO: error handling
 function start(){
     var certificate, key;
     // read ssl
@@ -92,9 +91,7 @@ function start(){
         if(collection == null) collection = "";
         var body = request.body;
         if(body != null) {
-            if(typeof body == "string"){
-                body = JSON.parse(body);
-            }
+            if(typeof body == "string") body = JSON.parse(body);
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
@@ -140,9 +137,7 @@ function start(){
         else query = JSON.parse(query);
         var body = request.body;
         if(body != null) {
-            if(typeof body == "string"){
-                body = JSON.parse(body);
-            }
+            if(typeof body == "string") body = JSON.parse(body);
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
