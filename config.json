@@ -3,10 +3,6 @@
     "logging": true,
     "database_url": "mongodb://192.168.99.100",
     "port": 80,
-    "throttle": {
-        "burst": 100,
-        "rate": 50
-    },
     "auth": true,
     "user":[
         {
