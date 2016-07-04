@@ -1,5 +1,6 @@
 'use strict';
 
+// TODO: remove debu temp codes
 // dependency declaration
 var mongoClient = require('mongodb').MongoClient,
     assert = require('assert'),
@@ -25,6 +26,7 @@ start();
 
 // setup function
 // @arg next function next function to run
+// TODO: error handling
 function start(){
     var certificate, key;
     // read ssl
@@ -32,7 +34,7 @@ function start(){
         // read ssl certificate
         certificate = fs.readFileSync(path.join(__dirname + "ssl/certificate"));
         key = fs.readFileSync(path.join(__dirname + "ssl/key"));
-    }catch(err){
+    } catch(err){
         certificate = "";
         key = "";
         console.warn("certificate and/or key not found in ssl folder".warn);
@@ -47,17 +49,15 @@ function start(){
 
     server.use(restify.queryParser());
     server.use(restify.bodyParser({mapParams: true}));
+    server.pre(restify.pre.userAgentConnection());
 
     // get request handler
-    // TODO: handle text and json type
     server.get("/", (request, response, next)=>{
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var query = request.query.query;
         if(query == null) query = {};
-        else {
-            query = JSON.parse(query);
-        }
+        else query = JSON.parse(query);
         mongoClient.connect(url, (err, data)=>{
             if (!err) {
                 console.log("Connected successfully to " + url + " database");
@@ -85,12 +85,16 @@ function start(){
     });
 
     // post request handler
-    // TODO: handle text and json type
     server.post("/", (request, response, next)=>{
+        request.accepts('text/plain');
+        request.accepts('application/json');
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var body = request.body;
         if(body != null) {
+            if(typeof body == "string"){
+                body = JSON.parse(body);
+            }
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
@@ -126,8 +130,9 @@ function start(){
     });
 
     // put request handler
-    // TODO: handle text and json type
     server.put("/", (request, response, next)=>{
+        request.accepts('text/plain');
+        request.accepts('application/json');
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var query = request.query.query;
@@ -135,7 +140,9 @@ function start(){
         else query = JSON.parse(query);
         var body = request.body;
         if(body != null) {
-            body = JSON.parse(body);
+            if(typeof body == "string"){
+                body = JSON.parse(body);
+            }
             mongoClient.connect(url, (err, data)=>{
                 if (!err) {
                     console.info("Connected successfully to " + url + " database");
@@ -171,8 +178,9 @@ function start(){
     });
 
     // delete request handler
-    // TODO: handle text and json type
     server.del("/", (request, response, next)=>{
+        request.accepts('text/plain');
+        request.accepts('application/json');
         var collection = request.query.collection;
         if(collection == null) collection = "";
         var query = request.query.query;
@@ -185,7 +193,7 @@ function start(){
                     if (err) {
                         response.send({
                             error: true,
-                            data: "error is error"
+                            data: result
                         });
                     } else {
                         response.send({
@@ -243,8 +251,6 @@ function restPost(db, collection, data, callback){
 // @arg callback function
 function restPut(db, collection, filter, data, callback){
     db.collection(collection).updateMany(filter, {$set:data}, (err, result)=>{
-        console.log(err);
-        if(err) console.error(err);
         callback(err, result);
     });
 }
